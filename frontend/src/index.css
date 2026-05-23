@@ -1,0 +1,69 @@
+/* src/index.css
+   WHY: Tailwind requires these three directives to inject its
+   base reset, component classes, and utility classes at build time.
+   We also add global overrides here that can't be expressed in Tailwind. */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Global Base Styles ─────────────────────────────────── */
+@layer base {
+  html {
+    font-family: "DM Sans", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    /* Near-black navy background — financial, authoritative */
+    @apply bg-slate-950 text-slate-100;
+  }
+
+  /* Monospaced numbers for financial figures throughout the app */
+  .font-financial {
+    font-family: "IBM Plex Mono", monospace;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* ── Custom Scrollbar (Webkit) ──────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-slate-900;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-600 rounded-full;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-500;
+}
+
+/* ── Upload Drop Zone Active Animation ──────────────────── */
+@keyframes pulse-border {
+  0%, 100% { border-color: rgb(52, 211, 153); opacity: 1; }
+  50%       { border-color: rgb(16, 185, 129); opacity: 0.7; }
+}
+
+.drop-active {
+  animation: pulse-border 1s ease-in-out infinite;
+}
+
+/* ── Shimmer Loading Effect ─────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgb(30, 41, 59) 25%,
+    rgb(51, 65, 85) 50%,
+    rgb(30, 41, 59) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
