@@ -7,6 +7,9 @@ import { connectDB } from "./utils/db.js";
 import authRoutes from "./routes/auth.routes.js";
 import uploadRoutes from "./routes/upload.routes.js";
 import statsRoutes from "./routes/stats.routes.js";
+import onboardingRoutes from "./routes/onboarding.routes.js";
+import debtorsRoutes from "./routes/debtors.routes.js";
+import chatRoutes from "./routes/chat.routes.js";
 import { errorHandler } from "./middleware/error.middleware.js";
 import { checkEmailConfig, verifyEmailTransporter } from "./utils/email.js";
 
@@ -38,6 +41,9 @@ app.get("/api/health", (_req, res) =>
 app.use("/api/auth", authRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/stats", statsRoutes);
+app.use("/api/onboarding", onboardingRoutes);
+app.use("/api/debtors", debtorsRoutes);
+app.use("/api/chat", chatRoutes);
 
 app.use(errorHandler);
 

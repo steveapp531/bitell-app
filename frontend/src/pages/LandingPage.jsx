@@ -1,458 +1,420 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getPublicStats } from "../utils/api.js";
 
-function useCountUp(target, duration = 2000) {
-  const [count, setCount] = useState(0);
-  const raf = useRef(null);
-  useEffect(() => {
-    if (!target) return;
-    const start = performance.now();
-    const tick = (now) => {
-      const elapsed = now - start;
-      const progress = Math.min(elapsed / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setCount(Math.floor(eased * target));
-      if (progress < 1) raf.current = requestAnimationFrame(tick);
-    };
-    raf.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf.current);
-  }, [target, duration]);
-  return count;
-}
-
-// ── Logo component reused across sections ─────────────────────
-function BitellLogo({ size = "md" }) {
-  const s = size === "lg" ? "w-10 h-10 text-base" : "w-8 h-8 text-sm";
+// ── Logo ─────────────────────────────────────────────────────
+function Logo({ dark = false }) {
   return (
-    <div className={`${s} rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/30`}>
-      <span className="text-slate-950 font-black">B</span>
+    <div className="flex items-center gap-2">
+      <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: dark ? "white" : "#0C2218" }}>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2L2 7l10 5 10-5-10-5z" fill={dark ? "#0C2218" : "white"} />
+          <path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke={dark ? "#0C2218" : "white"} strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
+      </div>
+      <span className={`text-lg font-bold tracking-tight ${dark ? "text-white" : "text-[#0C2218]"}`}>Bitell</span>
     </div>
   );
 }
 
-function NavBar() {
+function FeatureCard({ icon, title, description }) {
   return (
-    <nav className="fixed top-0 inset-x-0 z-50 border-b border-white/5 bg-slate-950/85 backdrop-blur-md">
-      <div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <BitellLogo />
-          <span className="text-white font-bold text-lg tracking-tight">
-            Bi<span className="text-emerald-400">tell</span>
-          </span>
-        </div>
-        <div className="flex items-center gap-3">
-          <a href="#pricing" className="hidden sm:block text-slate-400 hover:text-white text-sm transition-colors px-3 py-1.5">
-            Pricing
-          </a>
-          <Link to="/login" className="text-slate-400 hover:text-white text-sm transition-colors px-3 py-1.5">
-            Sign in
-          </Link>
-          <Link
-            to="/register"
-            className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400
-                       text-slate-950 text-sm font-bold transition-all
-                       shadow-lg shadow-emerald-500/25"
-          >
-            Start free trial
-          </Link>
-        </div>
+    <div className="bg-white rounded-2xl p-6 border border-gray-100 hover:border-green-200 hover:shadow-md transition-all">
+      <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-4" style={{ backgroundColor: "#EBF7F2" }}>
+        {icon}
       </div>
-    </nav>
+      <h3 className="text-base font-bold text-gray-900 mb-2">{title}</h3>
+      <p className="text-sm text-gray-500 leading-relaxed">{description}</p>
+    </div>
   );
 }
 
-function HeroSection({ statCount }) {
-  const animated = useCountUp(statCount, 1800);
+function IndustryPill({ name }) {
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center pt-16 px-5 overflow-hidden">
-      {/* Grid */}
-      <div
-        className="absolute inset-0 opacity-[0.04]"
-        style={{
-          backgroundImage:
-            "linear-gradient(#34d399 1px,transparent 1px),linear-gradient(90deg,#34d399 1px,transparent 1px)",
-          backgroundSize: "52px 52px",
-        }}
-      />
-      {/* Glow orbs */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[500px] rounded-full bg-emerald-500/5 blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full bg-blue-500/3 blur-3xl pointer-events-none" />
-
-      <div className="relative z-10 text-center max-w-4xl mx-auto">
-        {/* Intelligence badge */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full
-                        bg-emerald-500/10 border border-emerald-500/20 mb-8">
-          <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-emerald-400 text-xs font-medium tracking-wide">
-            Business Intelligence Made Simple
-          </span>
-        </div>
-
-        {/* Headline */}
-        <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-[1.08] mb-6 tracking-tight">
-          Your <span className="text-emerald-400">complete financial</span>{" "}
-          intelligence in minutes.
-        </h1>
-
-        <p className="text-slate-400 text-xl leading-relaxed mb-10 max-w-2xl mx-auto">
-          Stop living in spreadsheets. Bitell transforms your raw bank statements into 
-          actionable business intelligence—revealing profitable trends, hidden inefficiencies, 
-          and growth opportunities your competitors haven't found yet.
-        </p>
-
-        {/* CTAs */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-14">
-          <Link
-            to="/register"
-            className="px-8 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400
-                       text-slate-950 text-base font-black transition-all
-                       shadow-xl shadow-emerald-500/30 w-full sm:w-auto text-center"
-          >
-            Start your free 14-day trial →
-          </Link>
-          <Link
-            to="/login"
-            className="px-8 py-4 rounded-xl border border-slate-700
-                       hover:border-slate-600 text-slate-300 hover:text-white
-                       text-base transition-all w-full sm:w-auto text-center"
-          >
-            Sign in to dashboard
-          </Link>
-        </div>
-
-        {/* Live stats */}
-        <div className="inline-flex items-center gap-5 px-6 py-4 rounded-2xl
-                        bg-slate-900/80 border border-slate-800 backdrop-blur">
-          <div className="text-center">
-            <div className="text-3xl font-bold text-emerald-400 font-mono tabular-nums">
-              {statCount > 0 ? animated.toLocaleString() : "2,000+"}
-            </div>
-            <div className="text-slate-500 text-xs mt-1">statements analysed</div>
-          </div>
-          <div className="w-px h-10 bg-slate-800" />
-          <div className="text-left">
-            <div className="text-slate-300 text-sm font-semibold">Auto currency detection</div>
-            <div className="text-slate-500 text-xs">NGN, USD, GHS, KES & more</div>
-          </div>
-          <div className="w-px h-10 bg-slate-800 hidden sm:block" />
-          <div className="text-left hidden sm:block">
-            <div className="text-slate-300 text-sm font-semibold">Any bank. Any format.</div>
-            <div className="text-slate-500 text-xs">PDF or CSV supported</div>
-          </div>
-        </div>
-      </div>
-    </section>
+    <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-white border border-gray-200 text-gray-600">
+      {name}
+    </span>
   );
 }
 
-function FeatureGrid() {
-  const features = [
-    {
-      icon: "📊",
-      iconStyle: "font-black text-2xl text-emerald-400",
-      title: "Profit by category",
-      desc: "See exactly which product lines, service types, or business divisions are actually profitable. Close the ones that aren't.",
-    },
-    {
-      icon: "📈",
-      title: "Spot growth trends",
-      desc: "Identify which revenue streams are accelerating, which are stalling, and where to double down. Month-by-month clarity.",
-    },
-    {
-      icon: "💸",
-      title: "Track cash flow in real-time",
-      desc: "Know your actual cash position vs profit on paper. Avoid the cash flow crisis that kills businesses.",
-    },
-    {
-      icon: "🎯",
-      title: "Financial health scoring",
-      desc: "A single 0–100 score combining profit margins, expense ratios, cash growth, and financial stability. Know if your business is healthy.",
-    },
-    {
-      icon: "🔍",
-      title: "Uncover expense patterns",
-      desc: "Automatically detect which vendors, partners, or costs dominate your spending. Renegotiate the ones that matter most.",
-    },
-    {
-      icon: "💡",
-      title: "Get tactical recommendations",
-      desc: "Bitell doesn't just show you data—it tells you what to do: reduce supplier dependency, cut subscription waste, or rebalance your revenue mix.",
-    },
-    {
-      icon: "🌍",
-      title: "Multi-currency support",
-      desc: "Operate internationally with automatic detection of NGN, USD, GBP, EUR, GHS, KES, ZAR and more. Single dashboard, global business.",
-    },
-    {
-      icon: "🔒",
-      title: "Enterprise-grade security",
-      desc: "Your financial data is encrypted and never shared. We own zero interest in your business information—only in making your platform secure.",
-    },
-  ];
-
+function StatPill({ value, label }) {
   return (
-    <section className="py-24 px-5 bg-slate-900/30">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-14">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3 tracking-tight">
-            Intelligence your competitors don't have
-          </h2>
-          <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-            Turn numbers into decisions. Every insight is built for business owners who move fast.
-          </p>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {features.map((f) => (
-            <div
-              key={f.title}
-              className="bg-slate-900 border border-slate-800/80 rounded-2xl p-5
-                         hover:-translate-y-1 hover:border-slate-700 transition-all duration-200"
-            >
-              <div className={`text-3xl mb-4 ${f.iconStyle || ""}`}>{f.icon}</div>
-              <h3 className="text-white font-semibold text-sm mb-2">{f.title}</h3>
-              <p className="text-slate-500 text-xs leading-relaxed">{f.desc}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
+    <div className="text-center">
+      <p className="text-3xl font-bold text-white">{value}</p>
+      <p className="text-sm text-green-300">{label}</p>
+    </div>
   );
 }
 
-function HowItWorks() {
-  const steps = [
-    {
-      num: "01",
-      title: "Create your account",
-      desc: "Sign up in 30 seconds. No credit card required. Get 14 days of full access to explore your business deeper.",
-    },
-    {
-      num: "02",
-      title: "Upload your bank statement",
-      desc: "Drop any PDF or CSV file—any bank, any format. Bitell handles the messy parsing so you don't waste time.",
-    },
-    {
-      num: "03",
-      title: "Intelligence engine runs",
-      desc: "Our platform instantly categorises transactions, detects patterns, calculates your financial health, and generates insights only human accountants would charge thousands for.",
-    },
-    {
-      num: "04",
-      title: "Make smarter business decisions",
-      desc: "Revenue breakdowns, expense analysis, cash flow trends, and specific action items—everything you need to grow, delivered in seconds not days.",
-    },
-  ];
+const INDUSTRIES = [
+  "Restaurants", "Salons & beauty", "Pharmacies", "Mini-marts",
+  "Fashion brands", "Logistics", "Online vendors", "Distributors",
+  "Agencies", "Retail stores", "Small manufacturers", "Catering",
+];
 
-  return (
-    <section className="py-24 px-5">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-14">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3 tracking-tight">From statement to strategy in 60 seconds</h2>
-          <p className="text-slate-400">Fast, accurate, and built for business velocity.</p>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          {steps.map((s) => (
-            <div
-              key={s.num}
-              className="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex gap-4
-                         hover:border-slate-700 transition-colors"
-            >
-              <div className="text-emerald-400 font-mono font-black text-xs opacity-50 w-8 flex-shrink-0 pt-0.5">
-                {s.num}
-              </div>
-              <div>
-                <h3 className="text-white font-semibold mb-1.5">{s.title}</h3>
-                <p className="text-slate-500 text-sm leading-relaxed">{s.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
+const FEATURES = [
+  {
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0C2218" strokeWidth="1.8">
+        <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+    title: "Cash Flow Intelligence",
+    description: "Know your safe-to-spend amount, predict cash shortages, and see exactly where your money is going — before problems hit.",
+  },
+  {
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0C2218" strokeWidth="1.8">
+        <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+    title: "Ask Bitell Anything",
+    description: "\"How much did I make today?\" \"Can I afford new inventory?\" Get instant, plain-English answers from your personal financial assistant.",
+  },
+  {
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0C2218" strokeWidth="1.8">
+        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+    title: "Debtors & Collections",
+    description: "Track who owes you money, when it's due, and send WhatsApp reminders in one tap. Never lose track of outstanding balances again.",
+  },
+  {
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0C2218" strokeWidth="1.8">
+        <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+    title: "Fraud & Leakage Alerts",
+    description: "Catch unusual withdrawals, duplicate payments, and suspicious patterns automatically. Protect your business from financial leakage.",
+  },
+  {
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0C2218" strokeWidth="1.8">
+        <circle cx="12" cy="12" r="10" />
+        <path d="M12 6v6l4 2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+    title: "Business Memory",
+    description: "Bitell learns your restocking cycles, spending patterns, and seasonal trends. It remembers what you forget — so you can plan ahead.",
+  },
+  {
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0C2218" strokeWidth="1.8">
+        <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+    title: "Tax & Record Ready",
+    description: "Auto-generate income summaries, expense reports, and profit/loss statements. Stay ready whenever records are needed — no scrambling.",
+  },
+];
 
-function WhoItsFor() {
-  const profiles = [
-    { emoji: "👗", type: "Fashion & Retail", desc: "Understand margins per location, per product line. Cut SKUs that drain profit. Scale what actually works." },
-    { emoji: "🚚", type: "Logistics & Transport", desc: "Route profitability on demand. See which clients, lanes, or contracts are your profit engines. Fire the rest." },
-    { emoji: "🍽️", type: "Food & Hospitality", desc: "Daily cash flow visibility. Know if today's service was profitable or you're burning money on low-margin traffic." },
-    { emoji: "💼", type: "Professional Services", desc: "Track project profitability in real-time. Know which client relationships actually generate surplus. Raise prices accordingly." },
-    { emoji: "🏗️", type: "Construction & Trades", desc: "Monitor job-level cash burn. Catch cost overruns before they become disasters. Protect project margins." },
-    { emoji: "🏥", type: "Healthcare & Clinics", desc: "Revenue stream analysis. Which services drive profit? Which drain resources? Data-driven service mix decisions." },
-    { emoji: "📱", type: "Tech & Agencies", desc: "Track recurring revenue vs CAC. Know which revenue stream, client, or product is your real profit engine." },
-    { emoji: "🛒", type: "E-commerce", desc: "Full funnel visibility. Understand unit economics, CAC payback, and true profitability per channel or product." },
-  ];
-
-  return (
-    <section className="py-24 px-5 bg-slate-900/30">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-14">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3 tracking-tight">
-            Business intelligence for every industry
-          </h2>
-          <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-            Every business needs clarity on cash flow and profitability. Bitell is built for industries that operate on data.
-          </p>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {profiles.map((p) => (
-            <div
-              key={p.type}
-              className="bg-slate-900 border border-slate-800 rounded-2xl p-5
-                         hover:border-emerald-500/20 transition-colors"
-            >
-              <div className="text-3xl mb-3">{p.emoji}</div>
-              <h3 className="text-white font-semibold text-sm mb-1.5">{p.type}</h3>
-              <p className="text-slate-500 text-xs leading-relaxed">{p.desc}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function PricingSection() {
-  const quarterly = [
-    "Unlimited statement uploads & analysis",
-    "Multi-currency transaction intelligence",
-    "Auto expense categorisation",
-    "Monthly & annual profitability dashboards",
-    "Financial health scoring",
-    "Revenue & expense trending",
-    "Email support",
-  ];
-  const annual = [
-    ...quarterly,
-    "Save 23% vs quarterly",
-    "Priority support",
-    "Early access to new features",
-  ];
-
-  return (
-    <section className="py-24 px-5" id="pricing">
-      <div className="max-w-3xl mx-auto">
-        <div className="text-center mb-14">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3 tracking-tight">Investment that pays for itself</h2>
-          <p className="text-slate-400">Most businesses make back their subscription cost in the first optimization Bitell suggests. 14-day free trial to prove it.</p>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          {/* Quarterly */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-7">
-            <p className="text-slate-400 text-xs uppercase tracking-widest mb-2">Quarterly</p>
-            <div className="flex items-baseline gap-1 mb-1">
-              <span className="text-4xl font-black text-white font-mono">$29</span>
-              <span className="text-slate-500 text-sm">/ 3 months</span>
-            </div>
-            <p className="text-emerald-400 text-xs font-mono mb-6">$9.67/month</p>
-            <ul className="space-y-2.5 mb-8">
-              {quarterly.map(f => (
-                <li key={f} className="flex items-start gap-2 text-sm text-slate-300">
-                  <span className="text-emerald-400 text-xs mt-0.5 flex-shrink-0">✓</span>{f}
-                </li>
-              ))}
-            </ul>
-            <Link
-              to="/register"
-              className="block w-full py-3 rounded-xl text-center bg-slate-800
-                         hover:bg-slate-700 border border-slate-700
-                         text-white text-sm font-bold transition-all"
-            >
-              Start free trial
-            </Link>
-          </div>
-
-          {/* Annual */}
-          <div className="relative bg-slate-900 border-2 border-emerald-500/50 rounded-2xl p-7">
-            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-              <span className="px-4 py-1 rounded-full bg-emerald-500 text-slate-950
-                               text-xs font-black shadow-lg shadow-emerald-500/30">
-                Best value
-              </span>
-            </div>
-            <p className="text-slate-400 text-xs uppercase tracking-widest mb-2">Annual</p>
-            <div className="flex items-baseline gap-1 mb-1">
-              <span className="text-4xl font-black text-white font-mono">$89</span>
-              <span className="text-slate-500 text-sm">/ year</span>
-            </div>
-            <p className="text-emerald-400 text-xs font-mono mb-6">$7.42/month · Save 23%</p>
-            <ul className="space-y-2.5 mb-8">
-              {annual.map(f => (
-                <li key={f} className="flex items-start gap-2 text-sm text-slate-300">
-                  <span className="text-emerald-400 text-xs mt-0.5 flex-shrink-0">✓</span>{f}
-                </li>
-              ))}
-            </ul>
-            <Link
-              to="/register"
-              className="block w-full py-3 rounded-xl text-center
-                         bg-emerald-500 hover:bg-emerald-400
-                         text-slate-950 text-sm font-black transition-all
-                         shadow-lg shadow-emerald-500/25"
-            >
-              Start free trial
-            </Link>
-          </div>
-        </div>
-
-        <p className="text-center text-slate-600 text-sm mt-8">
-          14-day free trial · Cancel anytime · 3-day grace period after expiry
-        </p>
-      </div>
-    </section>
-  );
-}
-
-function FooterCTA() {
-  return (
-    <section className="py-24 px-5 border-t border-slate-800">
-      <div className="max-w-2xl mx-auto text-center">
-        <BitellLogo size="lg" />
-        <h2 className="text-3xl sm:text-4xl font-bold text-white mt-6 mb-4 tracking-tight">
-          Your financial intelligence advantage starts today.
-        </h2>
-        <p className="text-slate-400 text-lg mb-8 leading-relaxed">
-          Join 2,000+ business owners who've replaced gut feeling with data.
-          See exactly where money flows, what actually profits, and what to do about it.
-        </p>
-        <Link
-          to="/register"
-          className="inline-block px-10 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400
-                     text-slate-950 font-black text-lg transition-all
-                     shadow-2xl shadow-emerald-500/25"
-        >
-          Start your free 14-day trial →
-        </Link>
-        <p className="text-slate-700 text-sm mt-4">No credit card required.</p>
-      </div>
-    </section>
-  );
-}
+const HOW_IT_WORKS = [
+  {
+    step: "01",
+    title: "Upload your bank statement",
+    description: "Drop your PDF or CSV bank statement. Bitell reads it instantly — no formatting required.",
+  },
+  {
+    step: "02",
+    title: "Bitell analyses everything",
+    description: "Transactions are categorised, trends detected, and cash flow is computed automatically.",
+  },
+  {
+    step: "03",
+    title: "See your complete picture",
+    description: "Dashboard, insights, alerts, and forecasts — all updated every time you upload.",
+  },
+  {
+    step: "04",
+    title: "Ask questions, take action",
+    description: "Chat with Bitell about your money. Get recommendations. Make confident decisions.",
+  },
+];
 
 export default function LandingPage() {
-  const [statCount, setStatCount] = useState(0);
+  const [stats, setStats] = useState({ statementsAnalysed: 0 });
 
   useEffect(() => {
-    getPublicStats().then((data) => {
-      setStatCount(data.statementsAnalysed || 2000);
-    });
+    getPublicStats().then(setStats).catch(() => {});
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-950 font-sans">
-      <NavBar />
-      <HeroSection statCount={statCount} />
-      <FeatureGrid />
-      <HowItWorks />
-      <WhoItsFor />
-      <PricingSection />
-      <FooterCTA />
-      <footer className="border-t border-slate-900 py-8 px-5 text-center">
-        <p className="text-slate-700 text-sm">
-          © {new Date().getFullYear()} Bitell · Business Financial Intelligence
+    <div className="min-h-screen bg-white" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+
+      {/* ── Navigation ─────────────────────────────────────────── */}
+      <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-100">
+        <div className="max-w-6xl mx-auto px-5 sm:px-8 py-4 flex items-center justify-between">
+          <Logo />
+          <div className="flex items-center gap-3">
+            <Link to="/login" className="text-sm font-medium text-gray-600 hover:text-gray-900 hidden sm:block">
+              Sign in
+            </Link>
+            <Link
+              to="/register"
+              className="px-4 py-2 rounded-xl text-sm font-semibold text-white transition-colors hover:opacity-90"
+              style={{ backgroundColor: "#0C2218" }}
+            >
+              Get started free
+            </Link>
+          </div>
+        </div>
+      </nav>
+
+      {/* ── Hero ───────────────────────────────────────────────── */}
+      <section className="max-w-6xl mx-auto px-5 sm:px-8 pt-16 pb-20 text-center">
+        <div
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold mb-6 border"
+          style={{ backgroundColor: "#EBF7F2", borderColor: "#A7F3D0", color: "#0C2218" }}
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+          Financial Operating System for African Businesses
+        </div>
+
+        <h1 className="text-4xl sm:text-6xl font-bold text-gray-900 leading-tight mb-6 max-w-4xl mx-auto">
+          Finally understand{" "}
+          <span style={{ color: "#0C2218" }}>what's happening</span>{" "}
+          with your business money
+        </h1>
+
+        <p className="text-lg sm:text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">
+          Bitell turns your bank statement into a complete financial picture — cash flow, insights, alerts, and a financial assistant — built for restaurants, salons, shops, and every serious African business.
         </p>
+
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Link
+            to="/register"
+            className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl text-base font-semibold text-white transition-all hover:opacity-90"
+            style={{ backgroundColor: "#0C2218" }}
+          >
+            Start for free — no card needed
+            <svg width="16" height="16" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </Link>
+          <Link
+            to="/login"
+            className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl text-base font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
+          >
+            Sign in
+          </Link>
+        </div>
+
+        <p className="text-sm text-gray-400 mt-5">
+          {stats.statementsAnalysed > 100
+            ? `${stats.statementsAnalysed.toLocaleString()}+ statements analysed`
+            : "Upload any bank statement · Results in seconds"}
+        </p>
+      </section>
+
+      {/* ── Hero mock card ─────────────────────────────────────── */}
+      <section className="max-w-sm mx-auto px-5 pb-20">
+        <div className="rounded-3xl p-6 text-white shadow-2xl" style={{ backgroundColor: "#0C2218" }}>
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-xs font-semibold tracking-widest text-green-300 uppercase">Available Cash</p>
+            <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-green-500 text-white">Healthy</span>
+          </div>
+          <p className="text-4xl font-bold mb-5">₦1,524,000</p>
+          <div className="grid grid-cols-2 gap-3 mb-5">
+            <div className="rounded-xl p-3" style={{ backgroundColor: "#163829" }}>
+              <p className="text-xs text-green-300 mb-1">↗ In this month</p>
+              <p className="text-lg font-bold">₦1.6M</p>
+            </div>
+            <div className="rounded-xl p-3" style={{ backgroundColor: "#163829" }}>
+              <p className="text-xs text-red-300 mb-1">↘ Out this month</p>
+              <p className="text-lg font-bold">₦1.3M</p>
+            </div>
+          </div>
+          <div className="rounded-xl p-3.5" style={{ backgroundColor: "#EBF7F2" }}>
+            <p className="text-xs font-bold text-green-800 mb-1">BITELL NOTICED</p>
+            <p className="text-xs text-gray-700">At your current spending rate, cash may run low in 9 days. The ₦450k rent is due next week.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Stats bar ──────────────────────────────────────────── */}
+      <section className="py-16" style={{ backgroundColor: "#0C2218" }}>
+        <div className="max-w-4xl mx-auto px-5 sm:px-8">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
+            <StatPill value="10+" label="business types served" />
+            <StatPill value="₦0" label="accounting knowledge needed" />
+            <StatPill value="30s" label="from upload to insights" />
+            <StatPill value="100%" label="built for African business" />
+          </div>
+        </div>
+      </section>
+
+      {/* ── Who it's for ───────────────────────────────────────── */}
+      <section className="max-w-6xl mx-auto px-5 sm:px-8 py-20">
+        <p className="text-sm font-semibold text-center uppercase tracking-widest mb-4" style={{ color: "#0C2218" }}>
+          Who it's for
+        </p>
+        <h2 className="text-3xl sm:text-4xl font-bold text-center text-gray-900 mb-4 max-w-2xl mx-auto">
+          Built for serious businesses that don't need an accountant on speed dial
+        </h2>
+        <p className="text-base text-gray-500 text-center max-w-xl mx-auto mb-10">
+          From ₦500k to ₦20M+ monthly. If your business runs through a bank account, Bitell works for you.
+        </p>
+        <div className="flex flex-wrap gap-2 justify-center">
+          {INDUSTRIES.map((name) => <IndustryPill key={name} name={name} />)}
+        </div>
+      </section>
+
+      {/* ── Features ───────────────────────────────────────────── */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-6xl mx-auto px-5 sm:px-8">
+          <p className="text-sm font-semibold uppercase tracking-widest text-center mb-4" style={{ color: "#0C2218" }}>
+            What Bitell does
+          </p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-center text-gray-900 mb-3 max-w-2xl mx-auto">
+            Not just a dashboard. A financial operating system.
+          </h2>
+          <p className="text-base text-gray-500 text-center max-w-xl mx-auto mb-12">
+            The clarity and control you need to run your business without flying blind.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {FEATURES.map((f, i) => <FeatureCard key={i} {...f} />)}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Real pain points ───────────────────────────────────── */}
+      <section className="max-w-6xl mx-auto px-5 sm:px-8 py-20">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-12 items-center">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-widest mb-4" style={{ color: "#0C2218" }}>The real problem</p>
+            <h2 className="text-3xl font-bold text-gray-900 mb-5 leading-tight">
+              Most business owners are financially reactive — not proactive
+            </h2>
+            <div className="flex flex-col gap-3">
+              {[
+                "Cash runs out and you don't know why",
+                "Personal and business money are mixed together",
+                "You have no idea if you're actually profitable",
+                "Debtors are tracked in your head or a notebook",
+                "Every financial decision feels like a guess",
+              ].map((p, i) => (
+                <div key={i} className="flex items-start gap-3">
+                  <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 bg-red-100">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="3">
+                      <path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" />
+                    </svg>
+                  </div>
+                  <p className="text-sm text-gray-700">{p}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-widest mb-4" style={{ color: "#0C2218" }}>Bitell changes this</p>
+            <div className="flex flex-col gap-3">
+              {[
+                "See your cash position clearly every day",
+                "Separate business from personal spending automatically",
+                "Know your profit margin at a glance",
+                "Track debtors and send reminders from one screen",
+                "Make confident decisions with real financial data",
+              ].map((p, i) => (
+                <div key={i} className="flex items-start gap-3">
+                  <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 bg-green-100">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="3">
+                      <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </div>
+                  <p className="text-sm text-gray-700">{p}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── How it works ───────────────────────────────────────── */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-6xl mx-auto px-5 sm:px-8">
+          <p className="text-sm font-semibold uppercase tracking-widest text-center mb-4" style={{ color: "#0C2218" }}>
+            How it works
+          </p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-center text-gray-900 mb-14">Up and running in minutes</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {HOW_IT_WORKS.map((step) => (
+              <div key={step.step}>
+                <div className="text-4xl font-black mb-4 leading-none" style={{ color: "#D1FAE5" }}>
+                  {step.step}
+                </div>
+                <h3 className="text-base font-bold text-gray-900 mb-2">{step.title}</h3>
+                <p className="text-sm text-gray-500 leading-relaxed">{step.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Questions Bitell can answer ────────────────────────── */}
+      <section className="max-w-6xl mx-auto px-5 sm:px-8 py-20">
+        <div className="text-center mb-12">
+          <p className="text-sm font-semibold uppercase tracking-widest mb-4" style={{ color: "#0C2218" }}>Ask Bitell</p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">Questions your business needs answered</h2>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {[
+            "Where is my money going?",
+            "How much can I safely spend this week?",
+            "Am I actually profitable?",
+            "Why is cash always finishing?",
+            "Who owes me money and for how long?",
+            "Is my business healthy?",
+            "Are my staff leaking money?",
+            "Can I survive next month?",
+            "What expenses are becoming dangerous?",
+          ].map((q) => (
+            <div
+              key={q}
+              className="flex items-center gap-3 p-4 bg-white border border-gray-100 rounded-xl hover:border-green-200 transition-colors"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0C2218" strokeWidth="2.5">
+                <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <span className="text-sm font-medium text-gray-700">"{q}"</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── CTA ────────────────────────────────────────────────── */}
+      <section className="py-20" style={{ backgroundColor: "#0C2218" }}>
+        <div className="max-w-2xl mx-auto px-5 sm:px-8 text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Stop guessing. Start knowing.</h2>
+          <p className="text-lg text-green-300 mb-10">
+            Clarity, control, and confidence — for every business that takes its money seriously.
+          </p>
+          <Link
+            to="/register"
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-base font-semibold bg-white hover:bg-gray-100 transition-colors"
+            style={{ color: "#0C2218" }}
+          >
+            Get started free
+            <svg width="16" height="16" fill="none" stroke="#0C2218" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </Link>
+          <p className="text-sm text-green-400 mt-4">No credit card required · 14-day free trial</p>
+        </div>
+      </section>
+
+      {/* ── Footer ─────────────────────────────────────────────── */}
+      <footer className="bg-gray-50 border-t border-gray-100 py-10">
+        <div className="max-w-6xl mx-auto px-5 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <Logo />
+          <p className="text-sm text-gray-400">
+            © {new Date().getFullYear()} Bitell. Financial Operating System for African Businesses.
+          </p>
+          <div className="flex gap-5 text-sm text-gray-400">
+            <Link to="/login" className="hover:text-gray-700">Sign in</Link>
+            <Link to="/register" className="hover:text-gray-700">Register</Link>
+          </div>
+        </div>
       </footer>
     </div>
   );

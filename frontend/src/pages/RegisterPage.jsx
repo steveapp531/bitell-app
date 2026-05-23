@@ -33,7 +33,7 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       await register(form.name.trim(), form.email.trim(), form.password);
-      navigate("/dashboard", { replace: true });
+      navigate("/onboarding", { replace: true });
     } catch (err) {
       setApiError(err.response?.data?.error || "Registration failed. Please try again.");
     } finally {

@@ -37,6 +37,12 @@ export const authAPI = {
   resetPassword: (token, password) => api.post("/auth/reset-password", { token, password }),
 };
 
+// ── Onboarding ────────────────────────────────────────────────
+export async function completeOnboarding(data) {
+  const res = await api.post("/onboarding/complete", data);
+  return res.data;
+}
+
 // ── Upload ────────────────────────────────────────────────────
 export async function uploadStatement(file, onProgress) {
   const formData = new FormData();
@@ -57,6 +63,32 @@ export async function getStatementHistory() {
 
 export async function getStatementById(id) {
   const res = await api.get(`/upload/${id}`);
+  return res.data;
+}
+
+export async function getLatestStatement() {
+  try {
+    const res = await api.get("/upload/history");
+    const statements = res.data?.statements || [];
+    if (statements.length === 0) return null;
+    const latest = await api.get(`/upload/${statements[0]._id}`);
+    return latest.data?.statement || null;
+  } catch {
+    return null;
+  }
+}
+
+// ── Debtors ───────────────────────────────────────────────────
+export const debtorsAPI = {
+  getAll: () => api.get("/debtors"),
+  create: (data) => api.post("/debtors", data),
+  update: (id, data) => api.put(`/debtors/${id}`, data),
+  delete: (id) => api.delete(`/debtors/${id}`),
+};
+
+// ── Chat / Ask Bitell ─────────────────────────────────────────
+export async function sendChatMessage(message, history = []) {
+  const res = await api.post("/chat", { message, history });
   return res.data;
 }
 

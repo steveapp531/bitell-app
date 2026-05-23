@@ -70,6 +70,13 @@ const userSchema = new mongoose.Schema(
 
     // ── Usage Stats (real counter for landing page) ───────────
     statementsAnalysed: { type: Number, default: 0 },
+
+    // ── Onboarding ────────────────────────────────────────────
+    businessName: { type: String, trim: true, default: null },
+    businessType: { type: String, default: null },
+    location: { type: String, trim: true, default: null },
+    monthlyRevenue: { type: String, default: null },
+    onboardingCompleted: { type: Boolean, default: false },
   },
   {
     timestamps: true, // createdAt, updatedAt
@@ -155,6 +162,11 @@ userSchema.methods.toPublicJSON = function () {
     statementsAnalysed: this.statementsAnalysed,
     accessLevel,
     createdAt: this.createdAt,
+    businessName: this.businessName,
+    businessType: this.businessType,
+    location: this.location,
+    monthlyRevenue: this.monthlyRevenue,
+    onboardingCompleted: this.onboardingCompleted,
   };
 };
 

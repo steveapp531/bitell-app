@@ -18,10 +18,10 @@ export default function ProtectedRoute({ children }) {
   // Show spinner while rehydrating session from localStorage
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-slate-700 border-t-emerald-400 rounded-full animate-spin" />
-          <p className="text-slate-500 text-sm">Loading...</p>
+          <div className="w-8 h-8 border-2 border-gray-200 border-t-[#0C2218] rounded-full animate-spin" />
+          <p className="text-gray-400 text-sm">Loading...</p>
         </div>
       </div>
     );

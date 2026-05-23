@@ -1,58 +1,42 @@
-import React, { useState } from "react";
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext.jsx";
+import React from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "./context/AuthContext.jsx";
 import ProtectedRoute from "./components/auth/ProtectedRoute.jsx";
 
-import LandingPage          from "./pages/LandingPage.jsx";
-import LoginPage            from "./pages/LoginPage.jsx";
-import RegisterPage         from "./pages/RegisterPage.jsx";
-import ForgotPasswordPage   from "./pages/ForgotPassword.jsx";
-import ResetPasswordPage    from "./pages/ResetPasswordPage.jsx";
-import SubscribePage        from "./pages/SubscribePage.jsx";
-import StatementHistoryPage from "./pages/StatementHistoryPage.jsx";
+import LandingPage        from "./pages/LandingPage.jsx";
+import LoginPage          from "./pages/LoginPage.jsx";
+import RegisterPage       from "./pages/RegisterPage.jsx";
+import ForgotPasswordPage from "./pages/ForgotPassword.jsx";
+import ResetPasswordPage  from "./pages/ResetPasswordPage.jsx";
+import SubscribePage      from "./pages/SubscribePage.jsx";
+import OnboardingPage     from "./pages/OnboardingPage.jsx";
+import DashboardShell     from "./pages/dashboard/DashboardShell.jsx";
 
-import Header        from "./components/dashboard/Header.jsx";
-import UploadPage    from "./pages/UploadPage.jsx";
-import DashboardPage from "./pages/DashboardPage.jsx";
+// After login/register, send to onboarding if not yet complete, else to dashboard
+function PostAuthRedirect() {
+  const { user, loading } = useAuth();
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <svg className="animate-spin w-8 h-8 text-[#0C2218]" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+        </svg>
+      </div>
+    );
+  }
+  if (!user) return <Navigate to="/login" replace />;
+  if (!user.onboardingCompleted) return <Navigate to="/onboarding" replace />;
+  return <Navigate to="/dashboard" replace />;
+}
 
-// ── Protected dashboard shell ─────────────────────────────────
-// Owns the upload→dashboard state and shares setData with history page.
-function DashboardApp() {
-  const [data, setData] = useState(null);
-  const navigate = useNavigate();
-
-  const handleHistoryLoad = (statement) => {
-    setData({
-      transactions: statement.transactions,
-      summary: statement.summary,
-      recommendation: statement.recommendation,
-      filename: statement.filename,
-      currency: statement.currency || statement.summary?.currency,
-    });
-    navigate("/dashboard");
-  };
-
-  return (
-    <div className="min-h-screen bg-slate-950 font-sans">
-      <Header onReset={data ? () => setData(null) : null} hasData={!!data} />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Routes>
-          <Route
-            index
-            element={
-              !data
-                ? <UploadPage onSuccess={setData} />
-                : <DashboardPage data={data} onReset={() => setData(null)} />
-            }
-          />
-          <Route
-            path="history"
-            element={<StatementHistoryPage onLoad={handleHistoryLoad} />}
-          />
-        </Routes>
-      </main>
-    </div>
-  );
+// Guard for onboarding — skip if already completed
+function OnboardingGuard({ children }) {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  if (!user) return <Navigate to="/login" replace />;
+  if (user.onboardingCompleted) return <Navigate to="/dashboard" replace />;
+  return children;
 }
 
 export default function App() {
@@ -67,15 +51,37 @@ export default function App() {
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password"  element={<ResetPasswordPage />} />
 
-          {/* Protected */}
+          {/* Post-auth redirect — figures out where to send the user */}
+          <Route path="/home" element={<ProtectedRoute><PostAuthRedirect /></ProtectedRoute>} />
+
+          {/* Onboarding wizard */}
           <Route
-            path="/dashboard/*"
-            element={<ProtectedRoute><DashboardApp /></ProtectedRoute>}
+            path="/onboarding"
+            element={
+              <ProtectedRoute>
+                <OnboardingGuard>
+                  <OnboardingPage />
+                </OnboardingGuard>
+              </ProtectedRoute>
+            }
           />
+
+          {/* New dashboard (all tabs inside DashboardShell) */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <DashboardShell />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Subscription */}
           <Route path="/subscribe" element={<ProtectedRoute><SubscribePage /></ProtectedRoute>} />
 
-          {/* Redirect legacy /history to /dashboard/history */}
-          <Route path="/history" element={<Navigate to="/dashboard/history" replace />} />
+          {/* Legacy redirects */}
+          <Route path="/dashboard/*" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/history"     element={<Navigate to="/dashboard" replace />} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
