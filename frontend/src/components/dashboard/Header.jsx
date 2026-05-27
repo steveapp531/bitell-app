@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
+import Logo from "../Logo.jsx";
 
 export default function Header({ onReset, hasData }) {
   const { user, logout } = useAuth();
@@ -22,14 +23,7 @@ export default function Header({ onReset, hasData }) {
         <div className="flex items-center justify-between h-16">
 
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-md shadow-emerald-500/30">
-              <span className="text-slate-950 font-black text-sm">B</span>
-            </div>
-            <span className="text-white font-bold text-lg tracking-tight">
-              Bi<span className="text-emerald-400">tell</span>
-            </span>
-          </Link>
+          <Logo />
 
           {/* Right side */}
           <div className="flex items-center gap-2 sm:gap-3">

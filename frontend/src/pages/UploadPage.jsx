@@ -39,7 +39,7 @@ export default function UploadPage({ onSuccess }) {
           Welcome back{user?.name ? `, ${user.name.split(" ")[0]}` : ""}!
         </h1>
         <p className="text-slate-400 text-base leading-relaxed">
-          Upload a PDF or CSV bank statement. Bitell will extract, categorise,
+          Upload a PDF or CSV of your transactions. Bitell will extract, categorise,
           detect your currency, and analyse every transaction in seconds.
         </p>
 
@@ -81,7 +81,7 @@ export default function UploadPage({ onSuccess }) {
           {[
             {
               step: "01",
-              title: "Upload Statement",
+              title: "Upload transactions",
               desc: "PDF or CSV — any major bank format supported.",
               icon: "📁",
             },

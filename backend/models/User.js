@@ -76,6 +76,7 @@ const userSchema = new mongoose.Schema(
     businessType: { type: String, default: null },
     location: { type: String, trim: true, default: null },
     monthlyRevenue: { type: String, default: null },
+    avatarUrl: { type: String, trim: true, default: null },
     onboardingCompleted: { type: Boolean, default: false },
   },
   {

@@ -46,8 +46,13 @@ export function AuthProvider({ children }) {
   const refreshUser = useCallback(async () => {
     try {
       const res = await authAPI.getMe();
-      setUser(res.data.user);
-    } catch { /* silently ignore */ }
+      const userData = res.data.user;
+      localStorage.setItem("bitell_user", JSON.stringify(userData));
+      setUser(userData);
+      return userData;
+    } catch {
+      return null;
+    }
   }, []);
 
   return (

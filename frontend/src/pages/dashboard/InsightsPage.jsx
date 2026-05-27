@@ -124,8 +124,8 @@ export default function InsightsPage() {
         </span>
       </div>
 
-      <h1 className="text-2xl font-bold text-gray-900 mb-1">What Bitell noticed</h1>
-      <p className="text-sm text-gray-500 mb-6">Plain-English insights from your transactions this period.</p>
+      <h1 className="text-2xl font-bold text-gray-900 mb-1">Bitell Insights</h1>
+      <p className="text-sm text-gray-500 mb-6">What your transactions are revealing about your business.</p>
 
       {loadingStatement && (
         <div className="flex items-center justify-center py-12">
@@ -139,7 +139,7 @@ export default function InsightsPage() {
       {!loadingStatement && !statement && (
         <div className="bg-white rounded-2xl p-8 text-center shadow-sm">
           <p className="text-base font-bold text-gray-900 mb-2">No data yet</p>
-          <p className="text-sm text-gray-500">Upload a bank statement to see AI-powered insights about your business.</p>
+          <p className="text-sm text-gray-500">Upload your transactions to see AI-powered insights about your business.</p>
         </div>
       )}
 

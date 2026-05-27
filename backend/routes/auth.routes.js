@@ -4,7 +4,7 @@
 
 import { Router } from "express";
 import rateLimit from "express-rate-limit";
-import { register, login, getMe, forgotPassword, resetPassword } from "../controllers/auth.controller.js";
+import { register, login, getMe, updateMe, forgotPassword, resetPassword } from "../controllers/auth.controller.js";
 import { protect } from "../middleware/auth.middleware.js";
 
 const router = Router();

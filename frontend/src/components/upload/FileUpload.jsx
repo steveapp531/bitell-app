@@ -95,10 +95,10 @@ export default function FileUpload({ onFile, uploadState, progress, error, onRes
           </div>
 
           <p className="text-lg font-medium text-slate-200 mb-1">
-            {isDragActive ? "Drop your statement here" : "Upload Bank Statement"}
+            {isDragActive ? "Drop your transactions file here" : "Upload transactions"}
           </p>
           <p className="text-sm text-slate-500 mb-4 text-center max-w-xs">
-            Drag & drop a PDF or CSV bank statement, or click to browse
+            Drag & drop a PDF or CSV of your transactions, or click to browse
           </p>
 
           {/* Supported format badges */}
@@ -171,7 +171,7 @@ export default function FileUpload({ onFile, uploadState, progress, error, onRes
               AI Analysing Transactions
             </p>
             <p className="text-slate-500 text-sm">
-              Gemini is categorising your statement…
+              Gemini is categorising your transactions…
             </p>
             <p className="text-slate-600 text-xs mt-1">This may take 10–30 seconds</p>
           </div>

@@ -1,21 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { getPublicStats } from "../utils/api.js";
+import Logo from "../components/Logo.jsx";
 
-// ── Logo ─────────────────────────────────────────────────────
-function Logo({ dark = false }) {
-  return (
-    <div className="flex items-center gap-2">
-      <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: dark ? "white" : "#0C2218" }}>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-          <path d="M12 2L2 7l10 5 10-5-10-5z" fill={dark ? "#0C2218" : "white"} />
-          <path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke={dark ? "#0C2218" : "white"} strokeWidth="1.5" strokeLinecap="round" />
-        </svg>
-      </div>
-      <span className={`text-lg font-bold tracking-tight ${dark ? "text-white" : "text-[#0C2218]"}`}>Bitell</span>
-    </div>
-  );
-}
+const chartData = {
+  month: [120, 160, 140, 190, 220, 210, 240],
+  quarter: [90, 130, 170, 195, 225, 210, 260, 240, 280, 300, 320, 340],
+  year: [120, 140, 130, 160, 190, 220, 210, 230, 250, 280, 310, 340],
+};
+
+const rangeLabels = {
+  month: "Last 30 days",
+  quarter: "Last 90 days",
+  year: "Last 12 months",
+};
 
 function FeatureCard({ icon, title, description }) {
   return (
@@ -31,7 +28,10 @@ function FeatureCard({ icon, title, description }) {
 
 function IndustryPill({ name }) {
   return (
-    <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-white border border-gray-200 text-gray-600">
+    <span
+      className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium"
+      style={{ backgroundColor: "#EBF7F2", border: "1px solid #A7F3D0", color: "#0C2218" }}
+    >
       {name}
     </span>
   );
@@ -60,7 +60,7 @@ const FEATURES = [
       </svg>
     ),
     title: "Cash Flow Intelligence",
-    description: "Know your safe-to-spend amount, predict cash shortages, and see exactly where your money is going — before problems hit.",
+    description: "Know your safe-to-spend amount, predict cash shortages, and see exactly where your money is going, before problems hit.",
   },
   {
     icon: (
@@ -77,8 +77,8 @@ const FEATURES = [
         <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     ),
-    title: "Debtors & Collections",
-    description: "Track who owes you money, when it's due, and send WhatsApp reminders in one tap. Never lose track of outstanding balances again.",
+    title: "Payments & Collections",
+    description: "Track who owes you money and what you owe, send reminders and stay on top of cash flow.",
   },
   {
     icon: (
@@ -97,7 +97,7 @@ const FEATURES = [
       </svg>
     ),
     title: "Business Memory",
-    description: "Bitell learns your restocking cycles, spending patterns, and seasonal trends. It remembers what you forget — so you can plan ahead.",
+    description: "Bitell learns your restocking cycles, spending patterns, and seasonal trends. It remembers what you forget, so you can plan ahead.",
   },
   {
     icon: (
@@ -106,15 +106,15 @@ const FEATURES = [
       </svg>
     ),
     title: "Tax & Record Ready",
-    description: "Auto-generate income summaries, expense reports, and profit/loss statements. Stay ready whenever records are needed — no scrambling.",
+    description: "Auto-generate income summaries, expense reports, and profit/loss statements. Stay ready whenever records are needed, no scrambling.",
   },
 ];
 
 const HOW_IT_WORKS = [
   {
     step: "01",
-    title: "Upload your bank statement",
-    description: "Drop your PDF or CSV bank statement. Bitell reads it instantly — no formatting required.",
+    title: "Upload your transactions",
+    description: "Drop your PDF or CSV of your transactions. Bitell reads it instantly, no formatting required.",
   },
   {
     step: "02",
@@ -124,7 +124,7 @@ const HOW_IT_WORKS = [
   {
     step: "03",
     title: "See your complete picture",
-    description: "Dashboard, insights, alerts, and forecasts — all updated every time you upload.",
+    description: "Dashboard, insights, alerts, and forecasts, all updated every time you upload.",
   },
   {
     step: "04",
@@ -134,11 +134,18 @@ const HOW_IT_WORKS = [
 ];
 
 export default function LandingPage() {
-  const [stats, setStats] = useState({ statementsAnalysed: 0 });
+  const [selectedRange, setSelectedRange] = useState("month");
 
-  useEffect(() => {
-    getPublicStats().then(setStats).catch(() => {});
-  }, []);
+  const activeSeries = chartData[selectedRange];
+  const totalCash = activeSeries.reduce((sum, value) => sum + value, 0) * 12000;
+  const growth = selectedRange === "month" ? 18 : selectedRange === "quarter" ? 27 : 34;
+  const minValue = Math.min(...activeSeries);
+  const maxValue = Math.max(...activeSeries);
+  const chartPoints = activeSeries.map((value, index) => ({
+    x: (index / (activeSeries.length - 1)) * 100,
+    y: 100 - ((value - minValue) / (maxValue - minValue)) * 80,
+  }));
+  const chartPath = chartPoints.map((point, i) => `${i === 0 ? "M" : "L"}${point.x} ${point.y}`).join(" ");
 
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: "'DM Sans', sans-serif" }}>
@@ -146,7 +153,7 @@ export default function LandingPage() {
       {/* ── Navigation ─────────────────────────────────────────── */}
       <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-5 sm:px-8 py-4 flex items-center justify-between">
-          <Logo />
+          <Logo dark />
           <div className="flex items-center gap-3">
             <Link to="/login" className="text-sm font-medium text-gray-600 hover:text-gray-900 hidden sm:block">
               Sign in
@@ -163,85 +170,106 @@ export default function LandingPage() {
       </nav>
 
       {/* ── Hero ───────────────────────────────────────────────── */}
-      <section className="max-w-6xl mx-auto px-5 sm:px-8 pt-16 pb-20 text-center">
-        <div
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold mb-6 border"
-          style={{ backgroundColor: "#EBF7F2", borderColor: "#A7F3D0", color: "#0C2218" }}
-        >
-          <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-          Financial Operating System for African Businesses
-        </div>
-
-        <h1 className="text-4xl sm:text-6xl font-bold text-gray-900 leading-tight mb-6 max-w-4xl mx-auto">
-          Finally understand{" "}
-          <span style={{ color: "#0C2218" }}>what's happening</span>{" "}
-          with your business money
-        </h1>
-
-        <p className="text-lg sm:text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">
-          Bitell turns your bank statement into a complete financial picture — cash flow, insights, alerts, and a financial assistant — built for restaurants, salons, shops, and every serious African business.
-        </p>
-
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Link
-            to="/register"
-            className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl text-base font-semibold text-white transition-all hover:opacity-90"
-            style={{ backgroundColor: "#0C2218" }}
-          >
-            Start for free — no card needed
-            <svg width="16" height="16" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24">
-              <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </Link>
-          <Link
-            to="/login"
-            className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl text-base font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
-          >
-            Sign in
-          </Link>
-        </div>
-
-        <p className="text-sm text-gray-400 mt-5">
-          {stats.statementsAnalysed > 100
-            ? `${stats.statementsAnalysed.toLocaleString()}+ statements analysed`
-            : "Upload any bank statement · Results in seconds"}
-        </p>
-      </section>
-
-      {/* ── Hero mock card ─────────────────────────────────────── */}
-      <section className="max-w-sm mx-auto px-5 pb-20">
-        <div className="rounded-3xl p-6 text-white shadow-2xl" style={{ backgroundColor: "#0C2218" }}>
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-xs font-semibold tracking-widest text-green-300 uppercase">Available Cash</p>
-            <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-green-500 text-white">Healthy</span>
-          </div>
-          <p className="text-4xl font-bold mb-5">₦1,524,000</p>
-          <div className="grid grid-cols-2 gap-3 mb-5">
-            <div className="rounded-xl p-3" style={{ backgroundColor: "#163829" }}>
-              <p className="text-xs text-green-300 mb-1">↗ In this month</p>
-              <p className="text-lg font-bold">₦1.6M</p>
+      <section className="max-w-6xl mx-auto px-5 sm:px-8 pt-16 pb-20">
+        <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] items-start">
+          <div className="text-center lg:text-left">
+            <div
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold mb-6 border"
+              style={{ backgroundColor: "#EBF7F2", borderColor: "#A7F3D0", color: "#0C2218" }}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+              Financial Operating System for African Businesses
             </div>
-            <div className="rounded-xl p-3" style={{ backgroundColor: "#163829" }}>
-              <p className="text-xs text-red-300 mb-1">↘ Out this month</p>
-              <p className="text-lg font-bold">₦1.3M</p>
+
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6 max-w-3xl mx-auto lg:mx-0">
+              See your business money clearly, from every transaction to cash flow.
+            </h1>
+
+            <p className="text-lg text-gray-500 max-w-2xl mx-auto lg:mx-0 mb-10 leading-relaxed">
+              Bitell turns your transactions into intelligent forecasting, alerts, payments tracking and actionable decisions, without accounting headaches.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
+              <Link
+                to="/register"
+                className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl text-base font-semibold text-white transition-all hover:opacity-90"
+                style={{ backgroundColor: "#0C2218" }}
+              >
+                Start for free, no card needed
+                <svg width="16" height="16" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </Link>
+              <Link
+                to="/login"
+                className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl text-base font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
+              >
+                Sign in
+              </Link>
             </div>
           </div>
-          <div className="rounded-xl p-3.5" style={{ backgroundColor: "#EBF7F2" }}>
-            <p className="text-xs font-bold text-green-800 mb-1">BITELL NOTICED</p>
-            <p className="text-xs text-gray-700">At your current spending rate, cash may run low in 9 days. The ₦450k rent is due next week.</p>
+
+          <div className="rounded-[2rem] border border-gray-100 bg-white p-6 shadow-lg">
+            <div className="flex flex-col gap-6">
+              <div>
+                <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Live cash flow</p>
+                <div className="mt-4 flex items-end gap-3">
+                  <p className="text-4xl font-bold text-slate-900">₦{(totalCash / 1000).toFixed(1)}k</p>
+                  <span className="rounded-full bg-emerald-100 px-3 py-1 text-sm font-semibold text-emerald-700">
+                    +{growth}%
+                  </span>
+                </div>
+                <p className="mt-2 text-sm text-slate-500">{rangeLabels[selectedRange]}</p>
+              </div>
+
+              <div className="inline-flex rounded-full bg-slate-100 p-1">
+                {Object.keys(rangeLabels).map((range) => (
+                  <button
+                    key={range}
+                    onClick={() => setSelectedRange(range)}
+                    className={`rounded-full px-3 py-1 text-xs font-semibold transition ${selectedRange === range ? "bg-emerald-50 text-emerald-700" : "text-slate-500 hover:text-emerald-700"}`}
+                  >
+                    {range === "month" ? "30d" : range === "quarter" ? "90d" : "12m"}
+                  </button>
+                ))}
+              </div>
+
+              <div className="overflow-hidden rounded-[1.75rem] bg-transparent p-4">
+                <svg viewBox="0 0 100 100" className="h-52 w-full">
+                  <defs>
+                    <linearGradient id="heroGradient" x1="0" x2="0" y1="0" y2="1">
+                      <stop offset="0%" stopColor="#BBF7D0" stopOpacity="0.6" />
+                      <stop offset="100%" stopColor="#BBF7D0" stopOpacity="0.05" />
+                    </linearGradient>
+                  </defs>
+                  <rect x="0" y="0" width="100" height="100" fill="#F8FAF6" />
+                  <path d={`${chartPath} L100 100 L0 100 Z`} fill="url(#heroGradient)" />
+                  <path d={chartPath} fill="none" stroke="#16A34A" strokeWidth="2" strokeLinecap="round" />
+                  {chartPoints.map((point, index) => (
+                    <circle key={index} cx={point.x} cy={point.y} r="3" fill="#16A34A" opacity="0.9" />
+                  ))}
+                </svg>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-3xl bg-slate-50 p-4">
+                  <p className="text-xs uppercase tracking-[0.25em] text-slate-400">Transactions</p>
+                  <p className="mt-3 text-lg font-semibold text-slate-900">{activeSeries.length * 12}</p>
+                </div>
+                <div className="rounded-3xl bg-slate-50 p-4">
+                  <p className="text-xs uppercase tracking-[0.25em] text-slate-400">Average ticket</p>
+                  <p className="mt-3 text-lg font-semibold text-slate-900">₦68k</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
-
-      {/* ── Stats bar ──────────────────────────────────────────── */}
-      <section className="py-16" style={{ backgroundColor: "#0C2218" }}>
-        <div className="max-w-4xl mx-auto px-5 sm:px-8">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
-            <StatPill value="10+" label="business types served" />
-            <StatPill value="₦0" label="accounting knowledge needed" />
-            <StatPill value="30s" label="from upload to insights" />
-            <StatPill value="100%" label="built for African business" />
-          </div>
+      {/* ── Trusted by (replacing generic stat bar) ──────────────────────────────────────────── */}
+      <section className="py-16 bg-white">
+        <div className="max-w-4xl mx-auto px-5 sm:px-8 text-center">
+          <h3 className="text-sm font-semibold uppercase tracking-widest mb-3" style={{ color: "#0C2218" }}>Trusted by</h3>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">Thousands of African small businesses use Bitell to turn transactions into clarity. From retail and hospitality to logistics and e-commerce.</p>
         </div>
       </section>
 
@@ -285,7 +313,7 @@ export default function LandingPage() {
           <div>
             <p className="text-sm font-semibold uppercase tracking-widest mb-4" style={{ color: "#0C2218" }}>The real problem</p>
             <h2 className="text-3xl font-bold text-gray-900 mb-5 leading-tight">
-              Most business owners are financially reactive — not proactive
+              Most business owners are financially reactive, not proactive
             </h2>
             <div className="flex flex-col gap-3">
               {[
@@ -373,10 +401,12 @@ export default function LandingPage() {
               key={q}
               className="flex items-center gap-3 p-4 bg-white border border-gray-100 rounded-xl hover:border-green-200 transition-colors"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0C2218" strokeWidth="2.5">
-                <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              <span className="text-sm font-medium text-gray-700">"{q}"</span>
+              <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-emerald-50">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16A34A" strokeWidth="2.2">
+                  <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+              <span className="text-sm font-medium text-gray-700">{q}</span>
             </div>
           ))}
         </div>
@@ -387,7 +417,7 @@ export default function LandingPage() {
         <div className="max-w-2xl mx-auto px-5 sm:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Stop guessing. Start knowing.</h2>
           <p className="text-lg text-green-300 mb-10">
-            Clarity, control, and confidence — for every business that takes its money seriously.
+            Clarity, control, and confidence, for every business that takes its money seriously.
           </p>
           <Link
             to="/register"
@@ -405,8 +435,8 @@ export default function LandingPage() {
 
       {/* ── Footer ─────────────────────────────────────────────── */}
       <footer className="bg-gray-50 border-t border-gray-100 py-10">
-        <div className="max-w-6xl mx-auto px-5 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <Logo />
+        <div className="max-w-6xl mx-auto px-5 sm:px-8 flex flex-col sm:flex-row items:center justify-between gap-4">
+          <Logo dark />
           <p className="text-sm text-gray-400">
             © {new Date().getFullYear()} Bitell. Financial Operating System for African Businesses.
           </p>

@@ -61,7 +61,7 @@ function AddDebtorModal({ onClose, onCreated }) {
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center" onClick={onClose}>
       <div className="bg-white rounded-t-2xl w-full max-w-lg p-6" onClick={(e) => e.stopPropagation()}>
-        <h2 className="text-xl font-bold text-gray-900 mb-5">Add debtor</h2>
+        <h2 className="text-xl font-bold text-gray-900 mb-5">Add receivable</h2>
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <input
             type="text"
@@ -112,7 +112,7 @@ function AddDebtorModal({ onClose, onCreated }) {
             className="w-full py-3.5 rounded-xl text-sm font-semibold text-white mt-1 disabled:opacity-50"
             style={{ backgroundColor: "#0C2218" }}
           >
-            {saving ? "Saving…" : "Add debtor"}
+              {saving ? "Saving…" : "Add receivable"}
           </button>
         </form>
         <button onClick={onClose} className="mt-3 w-full py-2.5 text-gray-500 text-sm">Cancel</button>
@@ -208,7 +208,7 @@ export default function DebtorsPage() {
   return (
     <div className="px-4 pt-5 pb-4">
       <div className="flex items-center justify-between mb-2">
-        <h1 className="text-2xl font-bold text-gray-900">Debtors</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Payments</h1>
         <button
           onClick={() => setShowAdd(true)}
           className="w-9 h-9 rounded-xl flex items-center justify-center text-white"
@@ -219,7 +219,7 @@ export default function DebtorsPage() {
           </svg>
         </button>
       </div>
-      <p className="text-sm text-gray-500 mb-5">People who owe you money.</p>
+      <p className="text-sm text-gray-500 mb-5">Money in — who owes you and when to expect payment.</p>
 
       {/* Summary cards */}
       {debtors.length > 0 && (
@@ -253,14 +253,14 @@ export default function DebtorsPage() {
               <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
-          <p className="text-base font-bold text-gray-900 mb-1">No debtors yet</p>
-          <p className="text-sm text-gray-500 mb-5">Track customers who owe you money and send WhatsApp reminders.</p>
+          <p className="text-base font-bold text-gray-900 mb-1">No records yet</p>
+          <p className="text-sm text-gray-500 mb-5">Track who owes you money and send reminders in one place.</p>
           <button
             onClick={() => setShowAdd(true)}
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white"
             style={{ backgroundColor: "#0C2218" }}
           >
-            Add first debtor
+            Add first record
           </button>
         </div>
       )}

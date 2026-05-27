@@ -101,6 +101,31 @@ export async function getMe(req, res) {
   res.json({ success: true, user: req.user.toPublicJSON() });
 }
 
+// ── Update Current User ───────────────────────────────────────
+export async function updateMe(req, res, next) {
+  try {
+    const { name, businessName, location, monthlyRevenue, avatarUrl } = req.body;
+    const user = req.user;
+
+    if (name !== undefined) {
+      const trimmed = String(name).trim();
+      if (!trimmed) {
+        return res.status(400).json({ success: false, error: "Name cannot be empty." });
+      }
+      user.name = trimmed;
+    }
+    if (businessName !== undefined) user.businessName = businessName ? String(businessName).trim() : null;
+    if (location !== undefined) user.location = location ? String(location).trim() : null;
+    if (monthlyRevenue !== undefined) user.monthlyRevenue = monthlyRevenue ? String(monthlyRevenue).trim() : null;
+    if (avatarUrl !== undefined) user.avatarUrl = avatarUrl ? String(avatarUrl).trim() : null;
+
+    await user.save();
+    res.json({ success: true, user: user.toPublicJSON() });
+  } catch (err) {
+    next(err);
+  }
+}
+
 // ── Forgot Password ───────────────────────────────────────────
 export async function forgotPassword(req, res, next) {
   try {

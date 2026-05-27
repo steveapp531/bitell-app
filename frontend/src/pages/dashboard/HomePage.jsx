@@ -68,8 +68,8 @@ function UploadModal({ onClose, onSuccess }) {
         className="bg-white rounded-t-2xl w-full max-w-lg p-6"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-xl font-bold text-gray-900 mb-1">Upload bank statement</h2>
-        <p className="text-gray-500 text-sm mb-5">PDF, CSV, or TXT from your bank</p>
+        <h2 className="text-xl font-bold text-gray-900 mb-1">Upload transactions</h2>
+        <p className="text-gray-500 text-sm mb-5">Transaction CSV, PDF, or export from your bank</p>
 
         {state === "idle" || state === "error" ? (
           <label className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-xl p-8 cursor-pointer hover:border-[#0C2218] transition-colors">
@@ -166,14 +166,14 @@ export default function HomePage({ onTabChange }) {
       onClick: () => onTabChange("insights"),
     },
     {
-      id: "debtors",
-      label: "Debtors",
+      id: "payments",
+      label: "Payments",
       icon: (
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
           <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       ),
-      onClick: () => onTabChange("debtors"),
+      onClick: () => onTabChange("payments"),
     },
   ];
 
@@ -207,7 +207,7 @@ export default function HomePage({ onTabChange }) {
           ) : availableCash !== null ? (
             `${sym}${Math.abs(availableCash).toLocaleString()}`
           ) : (
-            <span className="text-xl font-normal opacity-70">Upload a statement to start</span>
+            <span className="text-xl font-normal opacity-70">Upload transactions to start</span>
           )}
         </p>
         {s && (
@@ -376,13 +376,13 @@ export default function HomePage({ onTabChange }) {
             </svg>
           </div>
           <p className="text-base font-bold text-gray-900 mb-1">No financial data yet</p>
-          <p className="text-sm text-gray-500 mb-5">Upload your bank statement to see your full financial picture.</p>
+          <p className="text-sm text-gray-500 mb-5">Upload your transactions to see your full financial picture.</p>
           <button
             onClick={() => setShowUpload(true)}
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white"
             style={{ backgroundColor: "#0C2218" }}
           >
-            Upload statement
+            Upload transactions
           </button>
         </div>
       )}

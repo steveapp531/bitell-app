@@ -99,7 +99,7 @@ function generateAlerts(statement, debtors) {
       id: "overdue-debtors",
       severity: "warning",
       title: `${overdueDebtors.length} customer${overdueDebtors.length > 1 ? "s" : ""} overdue`,
-      detail: `${fmt(total, currency)} in overdue payments. Send WhatsApp reminders from the Debtors tab.`,
+      detail: `${fmt(total, currency)} in overdue payments. Send WhatsApp reminders from the Payments tab.`,
       time: "Now",
     });
   }
@@ -179,7 +179,7 @@ export default function AlertsPage() {
       {!loadingStatement && !statement && (
         <div className="bg-white rounded-2xl p-8 text-center shadow-sm">
           <p className="text-base font-bold text-gray-900 mb-2">No alerts yet</p>
-          <p className="text-sm text-gray-500">Upload a bank statement to see alerts and anomaly detection for your business.</p>
+          <p className="text-sm text-gray-500">Upload transactions to see alerts and anomaly detection for your business.</p>
         </div>
       )}
 

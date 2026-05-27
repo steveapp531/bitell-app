@@ -19,14 +19,8 @@ function Message({ msg }) {
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"} mb-3`}>
       {!isUser && (
-        <div
-          className="w-7 h-7 rounded-full flex items-center justify-center mr-2 flex-shrink-0 mt-0.5"
-          style={{ backgroundColor: "#0C2218" }}
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-            <path d="M12 2L2 7l10 5 10-5-10-5z" />
-            <path d="M2 17l10 5 10-5M2 12l10 5 10-5" strokeLinecap="round" />
-          </svg>
+        <div className="w-8 h-8 rounded-full flex items-center justify-center mr-2 flex-shrink-0 mt-0.5" style={{ backgroundColor: "#EBF7F2" }}>
+          <span style={{ color: "#0C2218", fontWeight: 700 }}>B</span>
         </div>
       )}
       <div
@@ -105,10 +99,11 @@ export default function AskBitellPage() {
       setConversations(newList);
       setActiveConvId(convId);
       localStorage.setItem("bitell_conversations", JSON.stringify(newList.slice(0, 20)));
-    } catch {
+    } catch (err) {
+      const serverMsg = err?.response?.data?.error || err?.message || "Sorry, I couldn't reach the server. Check your connection and try again.";
       setMessages((m) => [
         ...m,
-        { role: "assistant", content: "Sorry, I couldn't reach the server. Check your connection and try again." },
+        { role: "assistant", content: serverMsg },
       ]);
     } finally {
       setLoading(false);

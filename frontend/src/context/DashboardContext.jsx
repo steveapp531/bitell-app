@@ -41,6 +41,8 @@ export function DashboardProvider({ children }) {
     }
   }, []);
 
+  // Also expose loadPayables under payments naming for compatibility
+
   const loadPayables = useCallback(async () => {
     setLoadingPayables(true);
     try {

@@ -30,8 +30,8 @@ const tabs = [
     ),
   },
   {
-    id: "debtors",
-    label: "Ledger",
+    id: "payments",
+    label: "Payments",
     icon: (active) => (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? "#0C2218" : "#9CA3AF"} strokeWidth="1.8">
         <rect x="3" y="3" width="18" height="18" rx="2" strokeLinecap="round" strokeLinejoin="round" />

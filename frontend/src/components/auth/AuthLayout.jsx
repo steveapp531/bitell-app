@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import Logo from "../Logo.jsx";
 
 export default function AuthLayout({ title, subtitle, children }) {
   return (
@@ -13,14 +13,9 @@ export default function AuthLayout({ title, subtitle, children }) {
         }}
       />
 
-      <Link to="/" className="flex items-center gap-2.5 mb-8 z-10">
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/30">
-          <span className="text-slate-950 font-black text-base">B</span>
-        </div>
-        <span className="text-white font-bold text-xl tracking-tight">
-          Bi<span className="text-emerald-400">tell</span>
-        </span>
-      </Link>
+      <div className="mb-8 z-10">
+        <Logo dark />
+      </div>
 
       <div className="w-full max-w-md z-10 bg-slate-900/80 backdrop-blur border border-slate-800 rounded-2xl p-8 shadow-2xl">
         <div className="mb-7">
