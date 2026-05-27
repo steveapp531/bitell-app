@@ -31,12 +31,11 @@ const tabs = [
   },
   {
     id: "debtors",
-    label: "Debtors",
+    label: "Ledger",
     icon: (active) => (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? "#0C2218" : "#9CA3AF"} strokeWidth="1.8">
-        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" strokeLinecap="round" strokeLinejoin="round" />
-        <line x1="9" y1="12" x2="15" y2="12" strokeLinecap="round" />
-        <line x1="9" y1="16" x2="13" y2="16" strokeLinecap="round" />
+        <rect x="3" y="3" width="18" height="18" rx="2" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M3 9h18M9 9v12" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     ),
   },

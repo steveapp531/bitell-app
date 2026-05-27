@@ -1,69 +1,83 @@
-/* src/index.css
-   WHY: Tailwind requires these three directives to inject its
-   base reset, component classes, and utility classes at build time.
-   We also add global overrides here that can't be expressed in Tailwind. */
+/* src/index.css */
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ── Global Base Styles ─────────────────────────────────── */
+/* ── Global Base Styles ─────────────────────────────────────────
+   Use a neutral base so light-themed dashboard pages inherit
+   white/gray text correctly. Auth pages override via AuthLayout.
+   ────────────────────────────────────────────────────────────── */
 @layer base {
   html {
     font-family: "DM Sans", sans-serif;
     -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
-    /* Near-black navy background — financial, authoritative */
-    @apply bg-slate-950 text-slate-100;
+    @apply bg-white text-gray-900;
   }
 
-  /* Monospaced numbers for financial figures throughout the app */
+  /* Monospaced numbers for all financial figures */
   .font-financial {
     font-family: "IBM Plex Mono", monospace;
     font-variant-numeric: tabular-nums;
   }
+
+  /* Light-theme input reset — removes browser autofill yellow tint */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #111827;
+    -webkit-box-shadow: 0 0 0 1000px #fff inset;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  /* Dark-theme autofill (for auth pages with bg-slate-950) */
+  .dark-autofill input:-webkit-autofill,
+  .dark-autofill input:-webkit-autofill:hover,
+  .dark-autofill input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #f1f5f9;
+    -webkit-box-shadow: 0 0 0 1000px #1e293b inset;
+  }
 }
 
-/* ── Custom Scrollbar (Webkit) ──────────────────────────── */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  @apply bg-slate-900;
-}
-::-webkit-scrollbar-thumb {
-  @apply bg-slate-600 rounded-full;
-}
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-slate-500;
-}
+/* ── Scrollbar (Webkit) ─────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { @apply bg-gray-100; }
+::-webkit-scrollbar-thumb { @apply bg-gray-300 rounded-full; }
+::-webkit-scrollbar-thumb:hover { @apply bg-gray-400; }
 
-/* ── Upload Drop Zone Active Animation ──────────────────── */
+/* ── Auth dark pages use their own scrollbar ────────────────── */
+.auth-page ::-webkit-scrollbar-track { @apply bg-slate-900; }
+.auth-page ::-webkit-scrollbar-thumb { @apply bg-slate-600; }
+
+/* ── Drop Zone Animation ────────────────────────────────────── */
 @keyframes pulse-border {
-  0%, 100% { border-color: rgb(52, 211, 153); opacity: 1; }
-  50%       { border-color: rgb(16, 185, 129); opacity: 0.7; }
+  0%, 100% { border-color: #0C2218; opacity: 1; }
+  50%       { border-color: #22C55E; opacity: 0.7; }
 }
-
 .drop-active {
   animation: pulse-border 1s ease-in-out infinite;
 }
 
-/* ── Shimmer Loading Effect ─────────────────────────────── */
+/* ── Shimmer Loading ────────────────────────────────────────── */
 @keyframes shimmer {
   0%   { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
-
 .shimmer {
-  background: linear-gradient(
-    90deg,
-    rgb(30, 41, 59) 25%,
-    rgb(51, 65, 85) 50%,
-    rgb(30, 41, 59) 75%
-  );
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
+}
+
+/* ── Bounce dots for typing indicator ──────────────────────── */
+@keyframes bounce-dot {
+  0%, 80%, 100% { transform: translateY(0); }
+  40%           { transform: translateY(-4px); }
+}
+.bounce-dot {
+  animation: bounce-dot 1.2s ease-in-out infinite;
 }

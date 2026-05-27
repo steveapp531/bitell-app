@@ -68,22 +68,30 @@ export async function getStatementById(id) {
 
 export async function getLatestStatement() {
   try {
-    const res = await api.get("/upload/history");
-    const statements = res.data?.statements || [];
+    const histRes = await api.get("/upload/history");
+    const statements = histRes.data?.statements || [];
     if (statements.length === 0) return null;
-    const latest = await api.get(`/upload/${statements[0]._id}`);
-    return latest.data?.statement || null;
+    const statRes = await api.get(`/upload/${statements[0]._id}`);
+    return statRes.data?.statement || null;
   } catch {
     return null;
   }
 }
 
-// ── Debtors ───────────────────────────────────────────────────
+// ── Debtors (Receivables) ─────────────────────────────────────
 export const debtorsAPI = {
   getAll: () => api.get("/debtors"),
   create: (data) => api.post("/debtors", data),
   update: (id, data) => api.put(`/debtors/${id}`, data),
   delete: (id) => api.delete(`/debtors/${id}`),
+};
+
+// ── Payables ─────────────────────────────────────────────────
+export const payablesAPI = {
+  getAll: () => api.get("/payables"),
+  create: (data) => api.post("/payables", data),
+  update: (id, data) => api.put(`/payables/${id}`, data),
+  delete: (id) => api.delete(`/payables/${id}`),
 };
 
 // ── Chat / Ask Bitell ─────────────────────────────────────────

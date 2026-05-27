@@ -34,11 +34,11 @@ export default function AuthInput({ label, type = "text", value, onChange, place
           required={required}
           className={`
             w-full px-4 py-2.5 rounded-xl text-sm
-            bg-slate-800/60 border
-            text-slate-100 placeholder-slate-600
+            bg-slate-800 border
+            text-white placeholder-slate-500
             focus:outline-none focus:ring-2 focus:ring-emerald-500/40
             transition-all duration-150
-            ${error ? "border-red-500/60 focus:border-red-500" : "border-slate-700 focus:border-emerald-500/60"}
+            ${error ? "border-red-500/60 focus:border-red-500" : "border-slate-600 focus:border-emerald-500/60"}
           `}
         />
         {/* Show/hide toggle for password fields */}

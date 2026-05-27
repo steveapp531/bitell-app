@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-import { getLatestStatement, debtorsAPI } from "../utils/api.js";
+import { getLatestStatement, debtorsAPI, payablesAPI } from "../utils/api.js";
 
 const DashboardContext = createContext(null);
 
@@ -7,8 +7,11 @@ export function DashboardProvider({ children }) {
   const [statement, setStatement] = useState(null);
   const [debtors, setDebtors] = useState([]);
   const [debtorStats, setDebtorStats] = useState({ totalOutstanding: 0, overdueCount: 0 });
+  const [payables, setPayables] = useState([]);
+  const [payablesStats, setPayablesStats] = useState({ totalUpcoming: 0, overdueCount: 0, dueSoonCount: 0 });
   const [loadingStatement, setLoadingStatement] = useState(true);
   const [loadingDebtors, setLoadingDebtors] = useState(true);
+  const [loadingPayables, setLoadingPayables] = useState(true);
 
   const loadStatement = useCallback(async () => {
     setLoadingStatement(true);
@@ -38,10 +41,28 @@ export function DashboardProvider({ children }) {
     }
   }, []);
 
+  const loadPayables = useCallback(async () => {
+    setLoadingPayables(true);
+    try {
+      const res = await payablesAPI.getAll();
+      setPayables(res.data?.payables || []);
+      setPayablesStats({
+        totalUpcoming: res.data?.totalUpcoming || 0,
+        overdueCount: res.data?.overdueCount || 0,
+        dueSoonCount: res.data?.dueSoonCount || 0,
+      });
+    } catch {
+      setPayables([]);
+    } finally {
+      setLoadingPayables(false);
+    }
+  }, []);
+
   useEffect(() => {
     loadStatement();
     loadDebtors();
-  }, [loadStatement, loadDebtors]);
+    loadPayables();
+  }, [loadStatement, loadDebtors, loadPayables]);
 
   return (
     <DashboardContext.Provider
@@ -53,6 +74,10 @@ export function DashboardProvider({ children }) {
         debtorStats,
         loadingDebtors,
         reloadDebtors: loadDebtors,
+        payables,
+        payablesStats,
+        loadingPayables,
+        reloadPayables: loadPayables,
       }}
     >
       {children}

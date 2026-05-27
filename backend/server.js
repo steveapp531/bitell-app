@@ -9,6 +9,7 @@ import uploadRoutes from "./routes/upload.routes.js";
 import statsRoutes from "./routes/stats.routes.js";
 import onboardingRoutes from "./routes/onboarding.routes.js";
 import debtorsRoutes from "./routes/debtors.routes.js";
+import payablesRoutes from "./routes/payables.routes.js";
 import chatRoutes from "./routes/chat.routes.js";
 import { errorHandler } from "./middleware/error.middleware.js";
 import { checkEmailConfig, verifyEmailTransporter } from "./utils/email.js";
@@ -43,6 +44,7 @@ app.use("/api/upload", uploadRoutes);
 app.use("/api/stats", statsRoutes);
 app.use("/api/onboarding", onboardingRoutes);
 app.use("/api/debtors", debtorsRoutes);
+app.use("/api/payables", payablesRoutes);
 app.use("/api/chat", chatRoutes);
 
 app.use(errorHandler);

@@ -6,7 +6,7 @@ import BottomNav from "../../components/dashboard/BottomNav.jsx";
 import HomePage from "./HomePage.jsx";
 import InsightsPage from "./InsightsPage.jsx";
 import AskBitellPage from "./AskBitellPage.jsx";
-import DebtorsPage from "./DebtorsPage.jsx";
+import FinancePage from "./FinancePage.jsx";
 import AlertsPage from "./AlertsPage.jsx";
 
 function BitellLogo() {
@@ -79,7 +79,7 @@ export default function DashboardShell() {
       case "home":      return <HomePage onTabChange={setActiveTab} />;
       case "insights":  return <InsightsPage />;
       case "ask":       return <AskBitellPage />;
-      case "debtors":   return <DebtorsPage />;
+      case "debtors":   return <FinancePage />;
       case "alerts":    return <AlertsPage />;
       default:          return <HomePage onTabChange={setActiveTab} />;
     }
