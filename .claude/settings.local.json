@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\LENOVO YOGA X1\\\\Desktop\\\\Development\\\\bitell-app\\\\backend\\\\controllers\" -Name)"
+    ]
+  }
+}
